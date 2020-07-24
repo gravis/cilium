@@ -132,6 +132,10 @@ ifneq ($(LOCKDEBUG),)
     GO_TEST_FLAGS += -tags lockdebug
 endif
 
+# Consistently use the os/user pure Go implementation.
+GO_BUILD_FLAGS += -tags osusergo
+GO_TEST_FLAGS += -tags osusergo
+
 GO_BUILD_FLAGS += -ldflags '$(GO_BUILD_LDFLAGS) $(EXTRA_GO_BUILD_LDFLAGS)' $(EXTRA_GO_BUILD_FLAGS)
 
 GO_BUILD += $(GO_BUILD_FLAGS)
