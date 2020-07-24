@@ -4,6 +4,12 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
+# Some GNU Make trickery to basically achieve s/ /,/g
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
+COMMA := ,
+join-with-comma = $(subst $(SPACE),$(COMMA),$(strip $1))
+
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 RELATIVE_DIR := $(shell echo $(realpath .) | sed "s;$(ROOT_DIR)[/]*;;")
 include $(ROOT_DIR)/Makefile.quiet
@@ -48,6 +54,8 @@ GO_BUILD_FLAGS =
 GO_TEST_FLAGS =
 GO_CLEAN_FLAGS =
 GO_BUILD_LDFLAGS =
+# go build/test -tags values
+GO_TAGS_FLAGS = osusergo
 
 # This is declared here as it is needed to change the covermode depending on if
 # RACE is specified.
@@ -128,15 +136,11 @@ else
 endif
 
 ifneq ($(LOCKDEBUG),)
-    GO_BUILD_FLAGS += -tags lockdebug
-    GO_TEST_FLAGS += -tags lockdebug
+    GO_TAGS_FLAGS += lockdebug
 endif
 
-# Consistently use the os/user pure Go implementation.
-GO_BUILD_FLAGS += -tags osusergo
-GO_TEST_FLAGS += -tags osusergo
-
-GO_BUILD_FLAGS += -ldflags '$(GO_BUILD_LDFLAGS) $(EXTRA_GO_BUILD_LDFLAGS)' $(EXTRA_GO_BUILD_FLAGS)
+GO_BUILD_FLAGS += -ldflags '$(GO_BUILD_LDFLAGS) $(EXTRA_GO_BUILD_LDFLAGS)' -tags=$(call join-with-comma,$(GO_TAGS_FLAGS)) $(EXTRA_GO_BUILD_FLAGS)
+GO_TEST_FLAGS += -tags=$(call join-with-comma,$(GO_TAGS_FLAGS))
 
 GO_BUILD += $(GO_BUILD_FLAGS)
 GO_BUILD_WITH_CGO += $(GO_BUILD_FLAGS)
