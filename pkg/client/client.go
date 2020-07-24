@@ -240,13 +240,30 @@ func numReadyClusters(clustermesh *models.ClusterMeshStatus) int {
 	return numReady
 }
 
-// FormatStatusResponse writes a StatusResponse as a string to the writer.
-//
-// The parameters 'allAddresses', 'allControllers', 'allNodes', respectively,
-// cause all details about that aspect of the status to be printed to the
-// terminal. For each of these, if they are false then only a summary will be
-// printed, with perhaps some detail if there are errors.
-func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, allAddresses, allControllers, allNodes, allRedirects, allClusters bool) {
+type StatusDetails int
+
+const (
+	// StatusAllAddress causes all addresses to be printed by FormatStatusResponse.
+	StatusAllAddresses StatusDetails = 1 << iota
+	// StatusAllControllers causes all controllers to be printed by FormatStatusResponse.
+	StatusAllControllers
+	// StatusAllNodes causes all nodes to be printed by FormatStatusResponse.
+	StatusAllNodes
+	// StatusAllRedirects causes all redirects to be printed by FormatStatusResponse.
+	StatusAllRedirects
+	// StatusAllClusters causes all clusters to be printed by FormatStatusResponse.
+	StatusAllClusters
+
+	// StatusNoDetails causes no additional details to be printed by FormatStatusResponse.
+	StatusNoDetails StatusDetails = 0
+	// StatusAllDetails causes all additional details to be printed by FormatStatusResponse.
+	StatusAllDetails StatusDetails = ^StatusDetails(0)
+)
+
+// FormatStatusResponse writes a StatusResponse as a string to the writer. The bit mask sd controls
+// whether a additional details are printed about a certain aspect of the status. In case there are
+// errors, some details may be printed regardless of the value of sd.
+func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, sd StatusDetails) {
 	if sr.Kvstore != nil {
 		fmt.Fprintf(w, "KVStore:\t%s\t%s\n", sr.Kvstore.State, sr.Kvstore.Msg)
 	}
@@ -344,7 +361,7 @@ func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, allAddresses, 
 
 	if sr.Ipam != nil {
 		fmt.Fprintf(w, "IPAM:\t%s\n", sr.Ipam.Status)
-		if allAddresses {
+		if sd&StatusAllAddresses != 0 {
 			fmt.Fprintf(w, "Allocated addresses:\n")
 			out := []string{}
 			for ip, owner := range sr.Ipam.Allocations {
@@ -362,7 +379,7 @@ func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, allAddresses, 
 			numReadyClusters(sr.ClusterMesh), len(sr.ClusterMesh.Clusters), sr.ClusterMesh.NumGlobalServices)
 
 		for _, cluster := range sr.ClusterMesh.Clusters {
-			if allClusters || !cluster.Ready {
+			if sd&StatusAllClusters != 0 || !cluster.Ready {
 				fmt.Fprintf(w, "   %s: %s, %d nodes, %d identities, %d services, %d failures (last: %s)\n",
 					cluster.Name, clusterReadiness(cluster), cluster.NumNodes,
 					cluster.NumIdentities, cluster.NumSharedServices,
@@ -404,7 +421,7 @@ func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, allAddresses, 
 
 			if status.ConsecutiveFailureCount > 0 {
 				nFailing++
-			} else if !allControllers {
+			} else if sd&StatusAllControllers == 0 {
 				continue
 			}
 
@@ -436,7 +453,7 @@ func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, allAddresses, 
 	if sr.Proxy != nil {
 		fmt.Fprintf(w, "Proxy Status:\tOK, ip %s, %d redirects active on ports %s\n",
 			sr.Proxy.IP, sr.Proxy.TotalRedirects, sr.Proxy.PortRange)
-		if allRedirects && sr.Proxy.TotalRedirects > 0 {
+		if sd&StatusAllRedirects != 0 && sr.Proxy.TotalRedirects > 0 {
 			out := make([]string, 0, len(sr.Proxy.Redirects)+1)
 			for _, r := range sr.Proxy.Redirects {
 				out = append(out, fmt.Sprintf("  %s\t%s\t%d\n", r.Proxy, r.Name, r.ProxyPort))
