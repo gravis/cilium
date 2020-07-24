@@ -253,6 +253,9 @@ const (
 	StatusAllRedirects
 	// StatusAllClusters causes all clusters to be printed by FormatStatusResponse.
 	StatusAllClusters
+	// StatusBPFMapSizeDetails causes BPF map size details to be printed by
+	// FormatStatusResponse.
+	StatusBPFMapSizeDetails
 
 	// StatusNoDetails causes no additional details to be printed by FormatStatusResponse.
 	StatusNoDetails StatusDetails = 0
@@ -499,5 +502,19 @@ func FormatStatusResponse(w io.Writer, sr *models.StatusResponse, sd StatusDetai
 		}
 
 		fmt.Fprintf(w, "Hubble:\t%s\n", strings.Join(fields, "\t"))
+	}
+
+	if sd&StatusBPFMapSizeDetails != 0 && sr.BpfMaps != nil {
+		dynamicSizingStatus := "off"
+		ratio := sr.BpfMaps.DynamicSizeRatio
+		if 0.0 < ratio && ratio <= 1.0 {
+			dynamicSizingStatus = fmt.Sprintf("on (ratio: %f)", ratio)
+		}
+		fmt.Fprintf(w, "BPF Map sizes:\tdynamic sizing: %s\n", dynamicSizingStatus)
+		fmt.Fprintf(w, "  CT TCP\t%d\n", sr.BpfMaps.CtTCPMapSize)
+		fmt.Fprintf(w, "  CT any\t%d\n", sr.BpfMaps.CtAnyMapSize)
+		fmt.Fprintf(w, "  NAT\t%d\n", sr.BpfMaps.NatMapSize)
+		fmt.Fprintf(w, "  Neigh\t%d\n", sr.BpfMaps.NeighMapSize)
+		fmt.Fprintf(w, "  SockRev\t%d\n", sr.BpfMaps.SockRevMapSize)
 	}
 }

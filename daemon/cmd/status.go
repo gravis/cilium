@@ -200,6 +200,17 @@ func (d *Daemon) getKubeProxyReplacementStatus() *models.KubeProxyReplacement {
 	}
 }
 
+func (d *Daemon) getBPFMapSizes() *models.BPFMapSizes {
+	return &models.BPFMapSizes{
+		DynamicSizeRatio: option.Config.BPFMapsDynamicSizeRatio,
+		CtTCPMapSize:     int64(option.Config.CTMapEntriesGlobalTCP),
+		CtAnyMapSize:     int64(option.Config.CTMapEntriesGlobalAny),
+		NatMapSize:       int64(option.Config.NATMapEntriesGlobal),
+		NeighMapSize:     int64(option.Config.NeighMapEntriesGlobal),
+		SockRevMapSize:   int64(option.Config.SockRevNatEntries),
+	}
+}
+
 type getHealthz struct {
 	daemon *Daemon
 }
@@ -720,6 +731,7 @@ func (d *Daemon) startStatusCollector() {
 	}
 
 	d.statusResponse.Masquerading = d.getMasqueradingStatus()
+	d.statusResponse.BpfMaps = d.getBPFMapSizes()
 
 	d.statusCollector = status.NewCollector(probes, status.Config{})
 

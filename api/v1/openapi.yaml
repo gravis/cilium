@@ -1590,6 +1590,9 @@ definitions:
       cluster-mesh:
         description: Status of ClusterMesh
         "$ref": "#/definitions/ClusterMeshStatus"
+      bpf-maps:
+        description: Status of BPF maps
+        "$ref": "#/definitions/BPFMapSizes"
   Status:
     description: Status of an individual component
     type: object
@@ -2399,6 +2402,28 @@ definitions:
       last-error:
         description: Last error seen while performing desired action
         type: string
+  BPFMapSizes:
+    description: BPF map sizes
+    type: object
+    properties:
+      dynamic-size-ratio:
+        description: Ratio of total system memory to use for dynamic sizing of BPF maps
+        type: number
+      ct-tcp-map-size:
+        description: Size of the TCP connection tracking map
+        type: integer
+      ct-any-map-size:
+        description: Size of the non-TCP connection tracking map
+        type: integer
+      nat-map-size:
+        description: Size of the NAT map
+        type: integer
+      neigh-map-size:
+        description: Size of the neighbor table map
+        type: integer
+      sock-rev-map-size:
+        description: Size of the sock reverse NAT map
+        type: integer
   Metric:
     description: Metric information
     type: object

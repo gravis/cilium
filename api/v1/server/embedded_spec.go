@@ -1376,6 +1376,36 @@ func init() {
         }
       }
     },
+    "BPFMapSizes": {
+      "description": "BPF map sizes",
+      "type": "object",
+      "properties": {
+        "ct-any-map-size": {
+          "description": "Size of the non-TCP connection tracking map",
+          "type": "integer"
+        },
+        "ct-tcp-map-size": {
+          "description": "Size of the TCP connection tracking map",
+          "type": "integer"
+        },
+        "dynamic-size-ratio": {
+          "description": "Ratio of total system memory to use for dynamic sizing of BPF maps",
+          "type": "number"
+        },
+        "nat-map-size": {
+          "description": "Size of the NAT map",
+          "type": "integer"
+        },
+        "neigh-map-size": {
+          "description": "Size of the neighbor table map",
+          "type": "integer"
+        },
+        "sock-rev-map-size": {
+          "description": "Size of the sock reverse NAT map",
+          "type": "integer"
+        }
+      }
+    },
     "BackendAddress": {
       "description": "Service backend address",
       "type": "object",
@@ -3243,6 +3273,10 @@ func init() {
       "description": "Health and status information of daemon",
       "type": "object",
       "properties": {
+        "bpf-maps": {
+          "description": "Status of BPF maps",
+          "$ref": "#/definitions/BPFMapSizes"
+        },
         "cilium": {
           "description": "Status of Cilium daemon",
           "$ref": "#/definitions/Status"
@@ -5005,6 +5039,36 @@ func init() {
         }
       }
     },
+    "BPFMapSizes": {
+      "description": "BPF map sizes",
+      "type": "object",
+      "properties": {
+        "ct-any-map-size": {
+          "description": "Size of the non-TCP connection tracking map",
+          "type": "integer"
+        },
+        "ct-tcp-map-size": {
+          "description": "Size of the TCP connection tracking map",
+          "type": "integer"
+        },
+        "dynamic-size-ratio": {
+          "description": "Ratio of total system memory to use for dynamic sizing of BPF maps",
+          "type": "number"
+        },
+        "nat-map-size": {
+          "description": "Size of the NAT map",
+          "type": "integer"
+        },
+        "neigh-map-size": {
+          "description": "Size of the neighbor table map",
+          "type": "integer"
+        },
+        "sock-rev-map-size": {
+          "description": "Size of the sock reverse NAT map",
+          "type": "integer"
+        }
+      }
+    },
     "BackendAddress": {
       "description": "Service backend address",
       "type": "object",
@@ -6872,6 +6936,10 @@ func init() {
       "description": "Health and status information of daemon",
       "type": "object",
       "properties": {
+        "bpf-maps": {
+          "description": "Status of BPF maps",
+          "$ref": "#/definitions/BPFMapSizes"
+        },
         "cilium": {
           "description": "Status of Cilium daemon",
           "$ref": "#/definitions/Status"
