@@ -1337,7 +1337,7 @@ func init() {
       }
     },
     "BPFMapEntry": {
-      "description": "BPF map cache entry\"",
+      "description": "BPF map cache entry",
       "type": "object",
       "properties": {
         "desired-action": {
@@ -4966,7 +4966,7 @@ func init() {
       }
     },
     "BPFMapEntry": {
-      "description": "BPF map cache entry\"",
+      "description": "BPF map cache entry",
       "type": "object",
       "properties": {
         "desired-action": {
