@@ -28,6 +28,7 @@ import (
 
 	"github.com/cilium/cilium/api/v1/server"
 	"github.com/cilium/cilium/api/v1/server/restapi"
+	operatorOption "github.com/cilium/cilium/operator/option"
 	"github.com/cilium/cilium/pkg/bpf"
 	"github.com/cilium/cilium/pkg/cgroups"
 	"github.com/cilium/cilium/pkg/cleanup"
@@ -770,7 +771,7 @@ func init() {
 	flags.MarkHidden(option.PolicyTriggerInterval)
 	option.BindEnv(option.PolicyTriggerInterval)
 
-	flags.Bool(option.DisableCNPStatusUpdates, false, `Do not send CNP NodeStatus updates to the Kubernetes api-server (recommended to run with "cnp-node-status-gc=false" in cilium-operator)`)
+	flags.Bool(option.DisableCNPStatusUpdates, false, fmt.Sprintf(`Do not send CNP NodeStatus updates to the Kubernetes api-server (recommended to run with "%s=0" in cilium-operator)`, operatorOption.CNPNodeStatusGCInterval))
 	option.BindEnv(option.DisableCNPStatusUpdates)
 
 	flags.Bool(option.PolicyAuditModeArg, false, "Enable policy audit (non-drop) mode")
